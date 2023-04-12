@@ -25,6 +25,23 @@ async function detectObjects(model) {
     requestAnimationFrame(() => detectObjects(model));
 }
 
+function drawBoundingBoxes(predictions) {
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    predictions.forEach(prediction => {
+        const [x, y, width, height] = prediction.bbox;
+
+        context.strokeStyle = 'red';
+        context.lineWidth = 3;
+        context.strokeRect(x, y, width, height);
+
+        context.font = '18px Arial';
+        context.fillStyle = 'red';
+        context.fillText(prediction.class, x, y - 5);
+    });
+}
+
 async function main() {
     await setupCamera();
     video.play();
