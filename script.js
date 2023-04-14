@@ -44,15 +44,3 @@ function onResults(results) {
 }
 
 setupIrisTracking();
-
-  renderFrame();
-}
-
-function onResults(results) {
-  canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-  canvasCtx.drawImage(results.segmentationMask, 0, 0, canvasElement.width, canvasElement.height);
-  drawLandmarks(canvasCtx, results.multiIrisLandmarks, { lineWidth: 1, color: 'blue' });
-  // Use the pupil position as a pointer
-}
-
-setupIrisTracking();
