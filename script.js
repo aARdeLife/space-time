@@ -16,11 +16,9 @@ async function setupCamera() {
   });
 }
 
-async function setupIrisTracking() {
-  const iris = new Iris({ locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/iris/${file}` });
-  iris.setOptions({ maxNumIrisLandmarks: 1 });
-  iris.onResults(onResults);
-
+async function setupFaceApi() {
+  await faceapi.nets.tinyFaceDetector.loadFromUri('https://cdn.jsdelivr.net/npm/face-api.js/models');
+  await faceapi.nets.faceLandmark68TinyNet.loadFromUri('https://cdn.jsdelivr.net/npm/face-api.js/models');
   const camera = await setupCamera();
   camera.width = videoElement.videoWidth;
   camera.height = videoElement.videoHeight;
@@ -29,11 +27,26 @@ async function setupIrisTracking() {
 
   function renderFrame() {
     canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-    iris.send({ image: videoElement });
+    detectEyeLandmarks();
     requestAnimationFrame(renderFrame);
   }
   renderFrame();
 }
+
+async function detectEyeLandmarks() {
+  const options = new faceapi.TinyFaceDetectorOptions({ inputSize: 224 });
+  const result = await faceapi.detectSingleFace(videoElement, options).withFaceLandmarks(true, options);
+
+  if (result) {
+    const resizedResults = faceapi.resizeResults(result, { width: videoElement.videoWidth, height: videoElement.videoHeight });
+    faceapi.draw.drawFaceLandmarks(canvasElement, resizedResults, { lineWidth: 1, color: 'blue' });
+
+    // Use the pupil position as a pointer
+  }
+}
+
+setupFaceApi();
+
 
 function onResults(results) {
   if (results.multiIrisLandmarks) {
