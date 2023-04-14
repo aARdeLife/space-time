@@ -28,7 +28,7 @@ async function setupIrisTracking() {
   canvasElement.height = videoElement.videoHeight;
 
   function renderFrame() {
-    canvasCtx.drawImage(videoElement, 0, 0, videoElement.videoWidth, videoElement.videoHeight);
+    canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
     iris.send({ image: videoElement });
     requestAnimationFrame(renderFrame);
   }
@@ -36,10 +36,10 @@ async function setupIrisTracking() {
 }
 
 function onResults(results) {
-  canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-  canvasCtx.drawImage(results.segmentationMask, 0, 0, canvasElement.width, canvasElement.height);
-  drawLandmarks(canvasCtx, results.multiIrisLandmarks, { lineWidth: 1, color: 'blue' });
-  // Use the pupil position as a pointer
+  if (results.multiIrisLandmarks) {
+    drawLandmarks(canvasCtx, results.multiIrisLandmarks, { lineWidth: 1, color: 'blue' });
+    // Use the pupil position as a pointer
+  }
 }
 
 setupIrisTracking();
